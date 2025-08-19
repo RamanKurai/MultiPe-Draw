@@ -1,19 +1,12 @@
 import express from "express";
-import jwt from "jsonwebtoken"
-import { prismaClient } from "@repo/db/client";
 
 const app = express();
+app.use(express.json())
 
-app.post("/signup" , (req , res) => { 
-  
+app.use("api/v1" , )
+app.use("api/v1" , )
+
+
+app.listen(3001 ,()=> {
+    console.log('Server Running on the port: 3000')
 })
-
-app.post("/signin" , (req , res) => {
-
-})
-
-app.post("/room" , (req , res) => {
-    
-})
-
-app.listen(3001)
