@@ -2,6 +2,9 @@
   "name": "@repo/common",
   "version": "1.0.0",
   "description": "",
+    "exports" : {
+    "./types" : "./src/types.ts"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,8 +17,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "brcypt": "^1.0.1",
     "zod": "^4.0.17"
   }
 }
