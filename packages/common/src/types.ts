@@ -1,8 +1,8 @@
-import z from "zod";
+import { z } from "zod"
 
 export const CreateUserSchema = z.object({
-    email : z.email({ message : "Please enter the Valid Email."}).trim(),
-    password : z
+  email: z.email({ message: "Please enter the Valid Email." }).trim(),
+  password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long." })
     .regex(/[a-zA-Z]/, { message: "Must contain at least one letter." })
@@ -11,14 +11,16 @@ export const CreateUserSchema = z.object({
       message: "Must contain at least one special character.",
     })
     .trim(),
-    name : z.string().min(2, {message : "Name must be at least 2 characters long."})
-    .max(20 , {message : "Name must be at greater the 20 characters"})
-    .trim()
-})
+  name: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters long." })
+    .max(20, { message: "Name must be at greater the 20 characters" })
+    .trim(),
+});
 
 export const SigninSchema = z.object({
-     email: z.email({ message: "Please enter a valid email." }).trim(),
-     password: z
+  email: z.email({ message: "Please enter a valid email." }).trim(),
+  password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long." })
     .regex(/[a-zA-Z]/, { message: "Must contain at least one letter." })
@@ -27,7 +29,7 @@ export const SigninSchema = z.object({
       message: "Must contain at least one special character.",
     })
     .trim(),
-})
+});
 
 // export const CreateRoomSchema = z.object({
 //     name: z.string().min(3).max(20),

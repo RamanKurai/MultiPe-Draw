@@ -1,12 +1,11 @@
 import express from "express";
+import { userRouter } from "./routes/user";
 
 const app = express();
-app.use(express.json())
+app.use(express.json());
 
-app.use("api/v1" , )
-app.use("api/v1" , )
+app.use("api/v1", userRouter);
 
-
-app.listen(3001 ,()=> {
-    console.log('Server Running on the port: 3000')
-})
+app.listen(3001, () => {
+  console.log("Server Running on the port: 3000");
+});
