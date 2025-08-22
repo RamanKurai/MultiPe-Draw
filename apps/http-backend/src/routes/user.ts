@@ -1,83 +1,89 @@
 import { CreateUserSchema, SigninSchema } from "@repo/common/types";
 import express, { Router } from "express";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
 import { prismaClient } from "@repo/db/client";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 const userRouter: express.Router = Router();
-userRouter.use(express.json())
+userRouter.use(express.json());
 
-userRouter.post("/signup" , async (req: any, res: any) => {
-    const parsedData = CreateUserSchema.safeParse(req.body)
+userRouter.post("/signup", async (req: any, res: any) => {
+  const parsedData = CreateUserSchema.safeParse(req.body);
 
-    if (!parsedData.success) {
-        return res.status(400).json({
-            message : "Incorrect Format",
-            error : parsedData.error
-        })
+  if (!parsedData.success) {
+    return res.status(400).json({
+      message: "Incorrect Format/User Already exists with this email",
+      error: parsedData.error,
+    });
+  }
+
+  const email = req.body.email;
+  const password = req.body.password;
+  const name = req.body.name;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 5);
+    const newUser = await prismaClient.user.create({
+      data: {
+        email: email,
+        password: hashedPassword,
+        name: name,
+      },
+    });
+    res.json({
+      userId: newUser.id,
+      message: "You have signed up successfully",
+    });
+  } catch (error) {
+    res.status(403).json({
+      message: "Invalid Credentials/User Already exists with this email",
+    });
+  }
+});
+
+userRouter.post("/signin", async (req: any, res: any) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const parsedData = SigninSchema.safeParse(req.body);
+  if (!parsedData.success) {
+    res.json({
+      message: "Incorrect Inputs",
+    });
+  }
+
+  try {
+    const user = await prismaClient.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(403).json({ message: "Invalid Credentials" });
     }
 
-    const email =  req.body.email
-    const password = req.body.password
-    const name = req.body.name
+    const passwordMatched = await bcrypt.compare(password, user.password);
 
-    try {
-      const hashedPassword = bcrypt.hash(password , 5)
-     const newUser = await prismaClient.create({
-        email : email,
-        password : hashedPassword,
-        name : name
-      })
-      res.json({
-        userId : newUser.id,
-        message : "You have signed up successfully"
-      })
-    } catch (error) {
-        res.status(403).json({
-            message : "Invalid Credentials/User Already exists with this name"
-        })
-    } 
-})
-
-userRouter.post("/signin" , async (res : any , req : any) => {
-    const email = req.body.email
-    const password = req.body.password
-    
-    const parsedData = SigninSchema.safeParse(req.body)
-    if (!parsedData.success) {
-        res.json({
-            message : "Incorrect Inputs"
-        })
+    if (!passwordMatched) {
+      return res
+        .status(403)
+        .json({
+          message: "Invalid Credentials(Please Write the valid password)",
+        });
     }
 
-    try {
-        const user = await prismaClient.findOne({email})
+    const token = jwt.sign(
+      { id: user.id.toString() },
+      process.env.JWT_USER_SECRET || "defaultSecret"
+    );
 
-        if (!user) {
-            return res.status(403).json({message : "Invalid Credentials"})
-        }
+    res.json({
+      message: "You are Signed In successfully",
+      token: token,
+    });
+  } catch (error) {
+    console.error("SignIn-Error:", error);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
 
-        const passwordMatched = await bcrypt.compare(password , user.password)
-
-        if (!passwordMatched) {
-            return res.status(403).json({message : "Invalid Credentials(Please Write the valid password)"})
-        }
-
-        const token = jwt.sign(
-            {id : user._id.toString()},
-            process.env.JWT_USER_SECRET || "defaultSecret"
-        )
-
-        res.json({
-            message : "You are Signed In successfully",
-            token : token
-        })
-    } catch (error) {
-        console.error("SignIn-Error:", error)
-        res.status(500).json({message : "Something went wrong"})
-    }
-})
-
-export {
-    userRouter
-}
+export { userRouter };
