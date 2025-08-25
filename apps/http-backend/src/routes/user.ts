@@ -12,7 +12,7 @@ userRouter.post("/signup", async (req: any, res: any) => {
 
   if (!parsedData.success) {
     return res.status(400).json({
-      message: "Incorrect Format/User Already exists with this email",
+      message: "Incorrect Format",
       error: parsedData.error,
     });
   }
@@ -36,7 +36,7 @@ userRouter.post("/signup", async (req: any, res: any) => {
     });
   } catch (error) {
     res.status(403).json({
-      message: "Invalid Credentials/User Already exists with this email",
+      message: "Invalid Credentials",
     });
   }
 });

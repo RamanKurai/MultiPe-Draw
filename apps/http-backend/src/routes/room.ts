@@ -34,3 +34,7 @@ roomRouter.post("/room" , userMiddleware, async (req:any , res :any)=> {
     })
    }
 })
+
+export {
+    roomRouter
+}

@@ -1,5 +1,6 @@
 import express from "express";
 import { userRouter } from "./routes/user";
+import { roomRouter } from "./routes/room";
 
 const app = express();
 app.use(express.json());
