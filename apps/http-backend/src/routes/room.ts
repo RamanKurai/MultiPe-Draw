@@ -35,6 +35,41 @@ roomRouter.post("/room" , userMiddleware, async (req:any , res :any)=> {
    }
 })
 
+roomRouter.get("/shape/:roomId" , async (req :any  , res : any) => {
+    try {
+        const roomId = (req.params.roomId)
+        const message = await prismaClient.shape.findMany({
+            where : {
+                roomId : roomId
+            }, orderBy : {
+                id : "desc"
+            },
+            take : 1000
+        })
+
+        res.json({
+            message
+        })
+    } catch (error) {
+        console.log(error)
+        res.json({
+            messages : []
+        })
+    }
+})
+
+roomRouter.get("/room/:roomname" , async (req : any , res :any) => {
+    const roomname = req.params.roomname
+    const room =  await prismaClient.room.findFirst({
+        where : {
+            roomname
+        }
+    })
+
+    res.json({
+        room : room
+    })
+})
 export {
     roomRouter
 }
