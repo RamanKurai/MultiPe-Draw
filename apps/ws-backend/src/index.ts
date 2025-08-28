@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import jwt, { JwtPayload } from "jsonwebtoken"
 import {prismaClient} from "@repo/db/client"
-const JWT_USER_SECRET = process.env.JWT_USER_SECRET || "your_default_secret";
+const JWT_USER_SECRET = process.env.JWT_USER_SECRET || "defaultSecret";
 const wss = new WebSocketServer({ port: 8080 });
 
 interface User { 
@@ -15,6 +15,7 @@ const users : User[] = []
 function checkUser(token: string) {
   try {
     const decoded = jwt.verify(token, JWT_USER_SECRET) as JwtPayload;
+    console.log(JWT_USER_SECRET)
     if (typeof decoded == "string") {
       console.error("Decoded token is a string, expected object");
       return null;
@@ -70,8 +71,7 @@ wss.on('connection', function connection(ws, request) {
       }
       user.rooms = user?.rooms.filter(x => x === parsedData.room)
     }
-
-    console.log("message deleted")
+    console.log("message recieved")
     console.log(parsedData)
 
     if (parsedData.type === "chat") {

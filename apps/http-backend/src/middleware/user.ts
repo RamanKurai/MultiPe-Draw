@@ -7,6 +7,7 @@ const userMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
         const header = req.headers["authorization"];
         const decodedtoken = jwt.verify(header as string , JWT_USER_SECRET)
+        console.log(JWT_USER_SECRET)
 
         if (decodedtoken) {
             //@ts-ignore
