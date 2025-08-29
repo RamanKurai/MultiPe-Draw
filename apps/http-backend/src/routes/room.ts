@@ -29,8 +29,8 @@ roomRouter.post("/room" , userMiddleware, async (req:any , res :any)=> {
         roomId : room.id
     })
    } catch (error) {
-    res.status(411).json({
-        message : "Room already exists with name"
+    res.status(500).json({
+        message : "Some thing went wrong"
     })
    }
 })
@@ -60,7 +60,7 @@ roomRouter.get("/shape/:roomId" , async (req :any  , res : any) => {
 
 roomRouter.get("/room/:roomname" , async (req : any , res :any) => {
     const roomname = req.params.roomname
-    const room =  await prismaClient.room.findFirst({
+    const room =  await prismaClient.room.findMany({
         where : {
             roomname
         }

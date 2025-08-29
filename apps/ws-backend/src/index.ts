@@ -2,8 +2,8 @@ import { WebSocketServer, WebSocket } from 'ws';
 import jwt, { JwtPayload } from "jsonwebtoken"
 import {prismaClient} from "@repo/db/client"
 const JWT_USER_SECRET = process.env.JWT_USER_SECRET || "defaultSecret";
-const wss = new WebSocketServer({ port: 8080 });
 
+const wss = new WebSocketServer({ port: 8080 });
 interface User { 
   ws : WebSocket,
   rooms : string[],
