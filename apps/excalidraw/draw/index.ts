@@ -1,5 +1,4 @@
 import axios from "axios";
-import { HTTP_BACKEND } from "../config";
 
 type Shape =
   | {
@@ -32,8 +31,7 @@ export default async function initDraw(
   const ctx = canvas.getContext("2d");
 
   // Load existing shapes from backend
-  let existingShapes: Shape[] = await getExistingShapes(roomId);
-  console.log(existingShapes)
+  let existingShapes: Shape[] = await getExistingShapes(roomId) || [];
 
   if (!ctx) return;
 
@@ -85,6 +83,8 @@ export default async function initDraw(
 
     existingShapes.push(shape);
 
+      clearCanvas(existingShapes, canvas, ctx);
+
     socket.send(
       JSON.stringify({
         type: "chat",
@@ -123,22 +123,30 @@ function clearCanvas(
       ctx.strokeStyle = "rgba(255,255,255)";
       ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
     } 
+    console.log("existingShapes after fetch:", existingShapes, Array.isArray(existingShapes));
   });
 }
 
-// Fetch existing shapes from backend
+// to get the all existing shapes in the room , that you join 
 async function getExistingShapes(roomId: string): Promise<Shape[]> {
-  const res = await axios.get(`${HTTP_BACKEND}/shape/${roomId}`);
-  const messages: { message: string }[] = res.data.messages;
-
-  const shapes: Shape[] = messages.map((x) => {
-    try {
-      return JSON.parse(x.message) as Shape;
-    } catch (err) {
-      console.error("Invalid shape data from backend:", x.message);
-      return null;
+  try {
+    const res = await axios.get(`http://localhost:3001/api/v1/shape/${roomId}`);
+// this logic means the backend does not give the valid stuff / does not give array
+    if (res.data && Array.isArray(res.data.message)) {
+      return res.data.message.map((m: { message: string }) => {
+        try {
+          return JSON.parse(m.message);
+        } catch (err) {
+          console.error("Invalid shape JSON:", m.message);
+          return null;
+        }
+      }).filter(Boolean);
     }
-  }).filter((s): s is Shape => s !== null);
 
-  return shapes;
+    console.warn("Unexpected response format, falling back to []");
+    return [];
+  } catch (err) {
+    console.error("Failed to fetch shapes:", err);
+    return [];
+  }
 }
