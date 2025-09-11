@@ -1,3 +1,5 @@
+import axios from "axios"
+
 type Shape = {
     type : "rect",
     x : number,
@@ -11,14 +13,31 @@ type Shape = {
     radius : number
 }
 
+const initDraw = async (canvas: HTMLCanvasElement , roomId : string , socket : WebSocket): Promise<void> => {    
 
-const initDraw = (canvas: HTMLCanvasElement) => {
   const ctx = canvas.getContext("2d");
+
+    let existingShapes : Shape[] = await getExistingShapes(roomId) || [] ;
+
   if (!ctx) {
     return;
   } 
 
-  let existingShapes : Shape[] = [] ;
+  socket.onmessage = (event) => {
+    try {
+      const message = JSON.parse(event.data);
+
+      if (message.type === "chat") {
+        const parsedShape: Shape = JSON.parse(message.message);
+        existingShapes.push(parsedShape);
+        clearCanvas(existingShapes, canvas, ctx);
+      }
+    } catch (err) {
+      console.error("Error parsing socket message:", err);
+    }
+  };
+
+ clearCanvas(existingShapes , canvas , ctx)
 
   let startX: number = 0;
   let startY: number = 0;
@@ -44,15 +63,25 @@ const initDraw = (canvas: HTMLCanvasElement) => {
     isDrawing = false;
     const width = e.offsetX - startX;
     const height = e.offsetY - startY;
-    existingShapes.push({
+    const shape : Shape= {
         type : "rect",
         x : startX,
         y : startY,
-        width : width,
-        height : height
-    })
+        width,
+        height
+    }
+    existingShapes.push(shape);
+
+      clearCanvas(existingShapes, canvas, ctx);
+
+    socket.send(
+      JSON.stringify({
+        type: "chat",
+        message: JSON.stringify(shape),
+        roomId,
+      })
+    );
   });
-};
 
 function clearCanvas (existingShapes : Shape[] ,canvas : HTMLCanvasElement , ctx : CanvasRenderingContext2D) {
 ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -64,4 +93,16 @@ ctx.clearRect(0, 0, canvas.width, canvas.height);
   })
 }
 
+async function getExistingShapes(roomId : string) : Promise<Shape[]> {
+  const res = await axios.get(`http://localhost:3001/api/v1/shape/${roomId}`)
+  const message = res.data.message
+
+  const shapes =  message.map((x : {message : string}) => {
+    const messageData = JSON.parse(x.message)
+    return messageData as Shape;
+  })
+
+  return shapes;
+}
+}
 export default initDraw;
