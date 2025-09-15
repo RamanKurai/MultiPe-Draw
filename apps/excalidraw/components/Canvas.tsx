@@ -17,7 +17,6 @@ export default function Canvas ({
     const [game , setGame] = useState<Game>()
     const [selectedTool , setSelectedTool] = useState<Tool>("circle")
 
-
     useEffect(() => {
       game?.setTool(selectedTool)
     },[selectedTool , game])
@@ -27,13 +26,14 @@ export default function Canvas ({
       const g = new Game(canvasRef.current , roomId , socket)
       setGame(g)
 
+      g.start()
+
     return () => {
       g.destroy()
     }
-
     }
 
-  }, [canvasRef]);
+  }, []);
 
   return (
   <div className="h-100vh , overflow-hidden">

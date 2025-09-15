@@ -17,7 +17,8 @@ type Shape = {
     startX : number,
     startY :  number,
     endX : number,
-    endY :  number
+    endY :  number,
+    lineWidth : number 
 }  
 
 export default async function getExistingShapes(roomId: string): Promise<Shape[]> {
