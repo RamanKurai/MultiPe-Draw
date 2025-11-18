@@ -21,31 +21,19 @@ model User {
   emailVerified  DateTime?
   password       String
   image          String?
-  Room           Room[]
-
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   Shape          Shape[]
 }
 
-model Room {
-  id            String  @id @default(cuid())
-  roomname      String       
-  adminId       String
-  admin         User    @relation(fields : [adminId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  Shape         Shape[]
-}
 
 model Shape {
-  id            String  @id @default(uuid())
-  message       String
-  userId        String
-  user          User    @relation(fields : [userId] , references: [id])
-  roomId        String
-  Room          Room    @relation(fields : [roomId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id        String   @id @default(uuid())
+  data      Json     // store shape data, not message string
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  roomId    String?  // plain string, no relation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 

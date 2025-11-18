@@ -31,7 +31,4 @@ export const SigninSchema = z.object({
     .trim(),
 });
 
-export const CreateRoomSchema = z.object({
-  roomName: z.string().trim().min(3, "Room name must be at least 3 characters"),
-});
 
