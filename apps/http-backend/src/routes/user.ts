@@ -47,7 +47,7 @@ userRouter.post("/signin", async (req: any, res: any) => {
 
   const parsedData = SigninSchema.safeParse(req.body);
   if (!parsedData.success) {
-    res.json({
+  return res.json({
       message: "Incorrect Inputs",
     });
   }
@@ -58,7 +58,7 @@ userRouter.post("/signin", async (req: any, res: any) => {
     });
 
     if (!user) {
-      return res.status(403).json({ message: "Invalid Credentials" });
+      return res.status(403).json({ message: "Email already exists" });
     }
 
     const passwordMatched = await bcrypt.compare(password, user.password);

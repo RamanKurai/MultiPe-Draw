@@ -1,5 +1,6 @@
 import express, { Router } from "express";
 import { prismaClient } from "@repo/db/client";
+import { userMiddleware } from "../middleware/user";
 
 const shapeRouter: express.Router = Router();
 shapeRouter.use(express.json());
