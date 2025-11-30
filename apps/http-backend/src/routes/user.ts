@@ -36,7 +36,7 @@ userRouter.post("/signup", async (req: any, res: any) => {
     });
   } catch (error) {
     res.status(403).json({
-      message: "Invalid Credentials",
+      message: "Invalid Credentials means Same email already exists",
     });
   }
 });

@@ -1,11 +1,12 @@
-import dotenv from "dotenv"
-dotenv.config()
+import dotenv from "dotenv";
+dotenv.config();
+console.log("WS SECRET =", process.env.JWT_USER_SECRET)
 import { WebSocketServer, WebSocket } from "ws";
 import url from "url"
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { prismaClient } from "@repo/db/client";
 
-const JWT_USER_SECRET =  process.env.JWT_USER_SECRET
+const jwtUserSecret =  process.env.JWT_USER_SECRET || "defaultSecret"
 
 // intializing the websocketserver connection
 const wss = new WebSocketServer({ port : 8080})
@@ -17,7 +18,7 @@ const users = new Map<WebSocket, { userId: string | null }>()
 
 const authenticatedUser = (token : string) => {
    try {
-      const decoded = jwt.verify(token , JWT_USER_SECRET as string) as JwtPayload
+      const decoded = jwt.verify(token , jwtUserSecret as string) as JwtPayload
       if (typeof decoded == "string") {
       console.error("Decoded token is a string, expected object");
       return null;
@@ -48,7 +49,7 @@ wss.on("connection"  , (socket , request) => {
    const userId = authenticatedUser(token)
 
    if (!userId || userId == null) {
-      console.error("User Id not authenticated properly")
+      console.error("User not authenticated properly")
       socket.close(1008 , "User is not authenticated properly")
       return ;
    }
@@ -72,7 +73,7 @@ wss.on("connection"  , (socket , request) => {
     const shape = parsedMessage.shape
 
     if (!roomId || !rooms.has(roomId)) {
-      console.error("Invalid roomId in the shape update")
+      console.error("Invalid roomId for the shape update")
       return;
     }
 
