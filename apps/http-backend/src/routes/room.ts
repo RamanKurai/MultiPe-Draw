@@ -1,6 +1,5 @@
 import express, { Router } from "express";
 import { prismaClient } from "@repo/db/client";
-import { userMiddleware } from "../middleware/user";
 
 const shapeRouter: express.Router = Router();
 shapeRouter.use(express.json());
@@ -27,7 +26,6 @@ shapeRouter.get("/shape/:roomId" , async (req: any, res: any) => {
     res.json({
       shapes: [],
     });
-    
   }
 });
 
